@@ -1,0 +1,35 @@
+
+\begin{tikzpicture}[node distance = 2cm, auto]
+    % Place nodes master frame
+    \node [startstop] (start) {开始};
+    \node [block, right of=start, node distance=3cm] (setup_yolo) {加载初始化YOLOv3-tiny模型};
+    \node [block, right of=setup_yolo, node distance=3cm] (setup_list) {准备遍历图片};
+    \node [decision, below of=setup_list, node distance=3cm] (res_image) {是否还有图片未处理};
+    \node [block, left of=res_image, node distance=3cm] (read_image) {读取图片};
+    \node [block, left of=read_image, node distance=3cm] (call_yolo) {YOLO密集计算各点可能的检测框位置与信度};
+    \node [decision, left of=call_yolo, node distance=4cm] (decide_thres) {箱和滑块之一所有框最高信度小于阈值};
+    \node [block, below of=decide_thres, node distance=4cm] (max_one_conf) {取箱和滑块最高信度的框};
+    \node [decision, right of=max_one_conf, node distance=3cm] (judge_edge) {检测的框是否接近边缘};
+    \node [block, right of=judge_edge, node distance=4cm] (adjust) {按先验长宽比修正结果};
+    \node [block, below of=adjust, node distance=3cm](relative_loc) {根据框的中心估计滑块相对箱的位置};
+    \node [block, right of=relative_loc, node distance=3cm](save) {保存结果};
+    \node [startstop, below of=save, node distance=3cm](succ) {结束处理};
+    \node [startstop, below of=max_one_conf, node distance=3cm](fail) {失败};
+
+    \path [line] (start) -- (setup_yolo);
+    \path [line] (setup_yolo) -- (setup_list);
+    \path [line] (setup_list) -- (res_image);
+    \path [line] (res_image) -- node [near start] {yes} (read_image);
+    \path [line] (read_image) -- (call_yolo);
+    \path [line] (call_yolo) -- (decide_thres);
+    \path [line] (decide_thres) -- node [near start] {no} (max_one_conf);
+    \path [line] (max_one_conf) -- (judge_edge);
+    \path [line] (judge_edge) -- node [near start] {yes} (adjust);
+    \path [line] (adjust) -- (relative_loc);
+    \path [line] (relative_loc) -- (save);
+    \path [line] (decide_thres.west) |- node [near start] {yes} (fail);
+    \path [line] (judge_edge) |- node [near start] {no} (relative_loc);
+    \path [line] (save) -- (res_image.south);
+    \path [line] (res_image.east) |- node [near start] {no} (succ);
+
+\end{tikzpicture}
