@@ -526,6 +526,8 @@ http.ListenAndServeTLS(listenAddr, config.Crt, config.Key, nil)
 
 ## 减速器(CDN)
 
+![cdn](cdn.jpg)
+
 ip被block时，只能用CDN（如CloudFlare）复活，原理是先与cdn建立http/https连接（免费版非http的一般TCP无效，要收费使用），CDN转而与事先设定地址的某个proxy服务器建立http连接。这样就不会在连接服务器时被GFuckW block了。之后就和之前一样。
 
 websocket被cloudflarre免费版这事还被专门拿出来说了。
